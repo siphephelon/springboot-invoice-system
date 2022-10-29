@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en"
 	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+	<!--This page lists a client with all their invoices-->
 
 <head th:replace="layout/layout :: head"></head>
 
@@ -41,7 +42,7 @@
 							<li class="list-group-item"
 								th:text="#{text.cliente.email} + ': ' + ${client.email}"></li>
 							<li class="list-group-item"
-								th:text="#{text.cliente.createAt} + ': ' + ${client.createAt}"></li>
+								th:text="#{text.cliente.city} + ': ' + ${client.city}"></li>
 						</ul>
 
 						<div class="card-title pt-3 ">
@@ -66,7 +67,7 @@
 						class="table table-bordered table-striped my-4 shadow pt-3 bg-white rounded">
 						<thead class="thead-dark">
 							<tr>
-								<th th:text="#{text.cliente.factura.folio}">folio</th>
+								<th th:text="#{text.cliente.factura.folio}">Number</th>
 								<th th:text="#{text.cliente.factura.descripcion}">description</th>
 								<th th:text="#{text.cliente.factura.fecha}">date</th>
 								<th th:text="#{text.cliente.factura.total}">total</th>

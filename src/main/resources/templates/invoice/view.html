@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
+<!--This is a detailed invoice view-->
 <head th:replace="layout/layout :: head"></head>
 
 <body>
@@ -26,10 +27,7 @@
 							th:href="@{'/invoice/view/' + ${invoice.id}(format=pdf)}">
 							<i class="fas fa-file-pdf mr-2"></i> PDF
 						</a>
-						<a class="btn btn-success btn-md btn-sm-block float-right"
-							th:href="@{'/invoice/view/' + ${invoice.id}(format=xlsx)}">
-							<i class="fas fa-file-excel mr-2"></i> XLS
-						</a>
+						
 					</div>
 				</div>
 				<div class="row justify-content-center align-items-center">

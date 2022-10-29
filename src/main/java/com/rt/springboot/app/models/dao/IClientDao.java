@@ -11,5 +11,8 @@ public interface IClientDao extends PagingAndSortingRepository<Client, Long>{
 	// i = invoices
 	@Query("select c from Client c left join fetch c.invoices i where c.id = ?1")
 	public Client fetchByIdWithInvoices(Long id);
+
+	@Query("select i from Invoice i join fetch i.client c join fetch i.items l join fetch l.product where i.id = ?1")
+	public Client fetchByIdWithClientWithInvoiceItemWithProduct(Long id);
 	
 }

@@ -1,16 +1,29 @@
 package com.rt.springboot.app.controllers;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -29,6 +42,8 @@ import com.rt.springboot.app.models.entity.Invoice;
 import com.rt.springboot.app.models.entity.ItemInvoice;
 import com.rt.springboot.app.models.entity.Product;
 import com.rt.springboot.app.models.service.IClientService;
+import com.rt.springboot.app.models.service.IInvoiceService;
+import com.rt.springboot.app.util.paginator.PageRender;
 
 @Secured("ROLE_ADMIN")
 @Controller
@@ -36,8 +51,14 @@ import com.rt.springboot.app.models.service.IClientService;
 @SessionAttributes("invoice")
 public class InvoiceController {
 
+
+	protected final Log logger = LogFactory.getLog(this.getClass());
+	
 	@Autowired
 	private IClientService clientService;
+
+	@Autowired
+	private IInvoiceService invoiceService;
 	
 	@Autowired
 	private MessageSource messageSource;
@@ -60,6 +81,61 @@ public class InvoiceController {
 		model.addAttribute("title", String.format(messageSource.getMessage("text.factura.ver.titulo", null, locale), invoice.getDescription()));
 
 		return "invoice/view";
+	}
+	
+	/* ----- List Invoices ----- */
+	@Secured("ROLE_USER")
+	@GetMapping("/listi")
+	public String listinvoice(@RequestParam(name = "page", defaultValue = "0")int page, Model model,
+			Authentication authentication, HttpServletRequest request, Locale locale) {
+		// 2 Ways of seeing Roles
+				// 1st Way
+		if (authentication != null) {
+			logger.info("Hello authenticated user, Your username is: " + authentication.getName());
+		}
+
+		// 2nd Way(static)
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth != null) {
+			logger.info("Using Static form 'SecurityContextHolder.getContext().getAuthentication();': User authenticated, username: "
+					+ auth.getName());
+		}
+
+		// 3 Ways of assigning Roles
+		// 1st Way
+		if (hasRole("ROLE_ADMIN")) {
+			logger.info("Hello " + auth.getName() + " you have access");
+		} else {
+			logger.info("Hello " + auth.getName() + " No user access");
+		}
+
+		// 2nd Way
+		SecurityContextHolderAwareRequestWrapper securityContext = new SecurityContextHolderAwareRequestWrapper(request, "ROLE_");
+		if (securityContext.isUserInRole("ADMIN")) {
+			logger.info("Shape using SecurityContextHolderAwareRequestWrapper: Hello " + auth.getName() + " You have access");
+		} else {
+			logger.info("Shape using SecurityContextHolderAwareRequestWrapper: Hello " + auth.getName()	+ " No user access");
+		}
+		
+		// 3rd Way
+		if (request.isUserInRole("ROLE_ADMIN")) {
+			logger.info("Forma usando HttpServletRequest: Hola " + auth.getName() + " tienes acceso");
+		} else {
+			logger.info("Forma usando HttpServletRequest: Hola " + auth.getName() + " NO tienes acceso");
+		}
+
+		Pageable pageRequest = PageRequest.of(page, 10);
+		//Page<Client> clients = clientService.findAll(pageRequest);
+		Page<Invoice> invoices = invoiceService.findAll(pageRequest);
+		//PageRender<Client> pageRender = new PageRender<>("/list", clients);
+		PageRender<Invoice> pageRender = new PageRender<>("/list", invoices);
+
+				model.addAttribute("title", messageSource.getMessage("text.cliente.listar.titulo", null, locale));
+				//model.addAttribute("clients", clients);
+				model.addAttribute("invoices", invoices);
+				model.addAttribute("page", pageRender);
+		
+		return "/listinvoice";
 	}
 
 	/* ----- Create Invoice for Client[id] ----- */
@@ -139,6 +215,21 @@ public class InvoiceController {
 
 		flash.addFlashAttribute("error", messageSource.getMessage("text.factura.flash.db.error", null, locale));
 		return "redirect:/list/";
+	}
+	
+	private boolean hasRole(String role) {
+
+		SecurityContext context = SecurityContextHolder.getContext();
+
+		if (context == null) { return false; }
+		Authentication auth = context.getAuthentication();
+
+		if (auth == null) { return false; }
+		Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
+
+		// contains(GrantedAuthority) returns true or false if has the collection element or not
+		return authorities.contains(new SimpleGrantedAuthority(role));
+
 	}
 
 }

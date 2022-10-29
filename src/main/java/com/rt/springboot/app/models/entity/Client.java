@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
+//import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -14,15 +14,15 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+//import javax.persistence.Temporal;
+//import javax.persistence.TemporalType;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+//import javax.validation.constraints.NotNull;
 
-import org.springframework.format.annotation.DateTimeFormat;
+//import org.springframework.format.annotation.DateTimeFormat;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+//import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 
@@ -43,12 +43,10 @@ public class Client implements Serializable {
 	@NotEmpty
 	@Email
 	private String email;
+	
+	@NotEmpty
+	private String city;
 
-	@NotNull
-	@Column(name = "create_at")
-	@Temporal(TemporalType.DATE)
-	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	@JsonFormat(pattern = "yyyy-MM-dd")
 	private Date createAt;
 
 	@OneToMany(mappedBy = "client", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -72,36 +70,70 @@ public class Client implements Serializable {
 	public String toString() {
 		return firstName + " " + lastName;
 	}
-	
-	/*----- Getters & Setters -----*/
-	public Long getId() { return id; }
-	
-	public void setId(Long id) { this.id = id; }
-	
-	public String getFirstName() { return firstName; }
-	
-	public void setFirstName(String firstName) { this.firstName = firstName; }
-	
-	public String getLastName() { return lastName; }
-	
-	public void setLastName(String lastName) { this.lastName = lastName; }
-	
-	public String getEmail() { return email; }
-	
-	public void setEmail(String email) { this.email = email; }
-	
-	public Date getCreateAt() { return createAt; }
-	
-	public void setCreateAt(Date createAt) { this.createAt = createAt; }
-	
-	public String getPhoto() { return photo; }
-	
-	public void setPhoto(String photo) { this.photo = photo; }
-	
-	public List<Invoice> getInvoices() { return invoices; }
-	
-	public void setInvoices(List<Invoice> invoices) { this.invoices = invoices; }
-	
-	public void addInvoice(Invoice invoice) { invoices.add(invoice); }
 
+	/*----- Getters & Setters -----*/
+	
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public Date getCreateAt() {
+		return createAt;
+	}
+
+	public void setCreateAt(Date createAt) {
+		this.createAt = createAt;
+	}
+
+	public List<Invoice> getInvoices() {
+		return invoices;
+	}
+
+	public void setInvoices(List<Invoice> invoices) {
+		this.invoices = invoices;
+	}
+
+	public String getPhoto() {
+		return photo;
+	}
+
+	public void setPhoto(String photo) {
+		this.photo = photo;
+	}
 }
